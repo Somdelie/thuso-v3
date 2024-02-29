@@ -1,14 +1,14 @@
-import { auth } from "@/auth";
+import Hero from "@/components/client/home/Hero";
 import React from "react";
 
-const page = async () => {
-  const session = await auth();
+const Home = async () => {
   return (
     <div>
-      <h1>{session?.user?.email}</h1>
-      <h2>{session?.user?.name}</h2>
+      <section className="hero min-h-screen overflow-hidden">
+        <Hero />
+      </section>
     </div>
   );
 };
 
-export default page;
+export default Home;

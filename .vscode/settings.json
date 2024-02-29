@@ -19,10 +19,20 @@
         "titleBar.inactiveForeground": "#e7e7e799"
     },
     "cSpell.words": [
+        "flexbugs",
         "hookform",
         "Ndoe",
+        "purgecss",
+        "Remy",
+        "shadcn",
         "Signin",
+        "Somdelie",
         "Thuso",
         "trpc"
-    ]
+    ],
+    
+        "files.associations": {
+        "*.css": "tailwindcss"
+        }
+        
 }
