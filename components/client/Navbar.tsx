@@ -9,6 +9,9 @@ import MegaMenu from "./MegaMenu";
 import { UserButton } from "@/components/auth/UserButton";
 import { useSession } from "next-auth/react";
 import { ThemeSwitcher } from "@/components/ui/ThemeSwitcher";
+import { Badge } from "@mui/material";
+import { MdMessage } from "react-icons/md";
+import { IoMdNotificationsOutline } from "react-icons/io";
 
 const Navbar = () => {
   const pathname = usePathname();
@@ -42,7 +45,6 @@ const Navbar = () => {
               </Link>
             </motion.span>
           </div>
-          <ThemeSwitcher />
           <div className=" hidden sm:flex items-center gap-2 capitalize text-gray-600 dark:text-gray-400">
             {navLinks?.map((link: any, index) => (
               <Link
@@ -59,15 +61,29 @@ const Navbar = () => {
             ))}
             <MegaMenu />
           </div>
-          <ThemeSwitcher />
           {session.data ? (
-            <div>
-              <Link
-                href="/projects/create"
-                className="px-2 py-1 hidden sm:block bg-roseRed hover:bg-rose-800 rounded text-gray-200"
-              >
-                Post a Project
-              </Link>
+            <div className="flex items-center gap-4">
+              <ThemeSwitcher />
+              <div className="flex items-center gap-2 sm:gap-4">
+                <Link
+                  href="/projects/create"
+                  className="px-2 py-1 hidden sm:block bg-roseRed hover:bg-rose-800 rounded text-gray-200"
+                >
+                  Post a Project
+                </Link>
+                <div className="flex items-center gap-2">
+                  <button>
+                    <Badge badgeContent={4} color="error">
+                      <IoMdNotificationsOutline size={24} />
+                    </Badge>
+                  </button>
+                  <button>
+                    <Badge badgeContent={4} color="error">
+                      <MdMessage size={24} />
+                    </Badge>
+                  </button>
+                </div>
+              </div>
               <UserButton />
             </div>
           ) : (

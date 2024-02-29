@@ -36,16 +36,16 @@ model Account {
 }
 
 model User {
-  id              String     @id @default(auto()) @map("_id") @db.ObjectId
-  email           String     @unique
-  name            String
-  phone           String?
-  image           String?
-  status          UserStatus @default(ACTIVE)
-  role            UserRole   @default(USER)
-  isEmailVerified DateTime?
-  address         Address?
-  password        String?
+  id            String     @id @default(auto()) @map("_id") @db.ObjectId
+  email         String     @unique
+  name          String
+  phone         String?
+  image         String?
+  status        UserStatus @default(ACTIVE)
+  role          UserRole   @default(USER)
+  emailVerified DateTime?
+  address       Address?
+  password      String?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

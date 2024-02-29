@@ -27,13 +27,15 @@ export default async function RootLayout({
 
   return (
     <SessionProvider session={session}>
-      <Providers>
-        <html lang="en">
-          <body className={inter.className}>
+      <html lang="en">
+        <body
+          className={`${inter.className} bg-gradient-to-b from-gray-300 to-white dark:from-gray-800 dark:to-gray-800 dark:bg-gray-800 transition `}
+        >
+          <Providers>
             <main className="min-h-screen">{children}</main>
-          </body>
-        </html>
-      </Providers>
+          </Providers>
+        </body>
+      </html>
     </SessionProvider>
   );
 }

@@ -17,6 +17,15 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useSession } from "next-auth/react";
 import { LogoutButton } from "./LogoutButton";
+import {
+  Briefcase,
+  HelpCircle,
+  LayoutDashboard,
+  LogOut,
+  Settings,
+  User,
+} from "lucide-react";
+import Link from "next/link";
 
 export const UserButton = () => {
   const session = useSession();
@@ -31,54 +40,71 @@ export const UserButton = () => {
           </AvatarFallback>
         </Avatar>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-56">
-        <DropdownMenuLabel>My Account</DropdownMenuLabel>
+      <DropdownMenuContent className="w-56 mr-2 dark:border-gray-800 dark:bg-gray-700 bg-white dark:text-gray-300">
+        <DropdownMenuLabel className="text-gray-500">
+          My Account
+        </DropdownMenuLabel>
+        <DropdownMenuSeparator className="" />
+        <DropdownMenuGroup className="border-b dark:border-gray-500">
+          <DropdownMenuItem>
+            <Link
+              href="#"
+              className="hover:bg-sky-500 dark:hover:bg-gray-800 rounded transition flex items-center w-full gap-3 px-2 py-1"
+            >
+              <User className="text-gray-500" />
+              Profile
+            </Link>
+          </DropdownMenuItem>
+          <DropdownMenuItem>
+            <Link
+              href="#"
+              className="hover:bg-sky-500 dark:hover:bg-gray-800 rounded transition flex items-center w-full gap-3 px-2 py-1"
+            >
+              <LayoutDashboard className="text-gray-500" />
+              Dashboard
+            </Link>
+          </DropdownMenuItem>
+          <DropdownMenuItem>
+            <Link
+              href="#"
+              className="hover:bg-sky-500 dark:hover:bg-gray-800 rounded transition flex items-center w-full gap-3 px-2 py-1"
+            >
+              <Settings className="text-gray-500" />
+              Settings
+            </Link>
+          </DropdownMenuItem>
+        </DropdownMenuGroup>
+        <DropdownMenuLabel className="text-gray-500">
+          Quick Access
+        </DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <DropdownMenuGroup>
+        <DropdownMenuGroup className="border-b dark:border-gray-500">
           <DropdownMenuItem>
-            Profile
-            <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut>
+            <Link
+              href="#"
+              className="hover:bg-sky-500 dark:hover:bg-gray-800 rounded transition flex items-center w-full gap-3 px-2 py-1"
+            >
+              <Briefcase className="text-gray-500" />
+              New Project
+            </Link>
           </DropdownMenuItem>
           <DropdownMenuItem>
-            Billing
-            <DropdownMenuShortcut>⌘B</DropdownMenuShortcut>
-          </DropdownMenuItem>
-          <DropdownMenuItem>
-            Settings
-            <DropdownMenuShortcut>⌘S</DropdownMenuShortcut>
-          </DropdownMenuItem>
-          <DropdownMenuItem>
-            Keyboard shortcuts
-            <DropdownMenuShortcut>⌘K</DropdownMenuShortcut>
+            <Link
+              href="#"
+              className="hover:bg-sky-500 dark:hover:bg-gray-800 rounded transition flex items-center w-full gap-3 px-2 py-1"
+            >
+              <HelpCircle className="text-gray-500" />
+              Support
+            </Link>
           </DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
-        <DropdownMenuGroup>
-          <DropdownMenuItem>Team</DropdownMenuItem>
-          <DropdownMenuSub>
-            <DropdownMenuSubTrigger>Invite users</DropdownMenuSubTrigger>
-            <DropdownMenuPortal>
-              <DropdownMenuSubContent>
-                <DropdownMenuItem>Email</DropdownMenuItem>
-                <DropdownMenuItem>Message</DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem>More...</DropdownMenuItem>
-              </DropdownMenuSubContent>
-            </DropdownMenuPortal>
-          </DropdownMenuSub>
-          <DropdownMenuItem>
-            New Project
-            <DropdownMenuShortcut>⌘+T</DropdownMenuShortcut>
-          </DropdownMenuItem>
-        </DropdownMenuGroup>
         <DropdownMenuSeparator />
-        <DropdownMenuItem>Support</DropdownMenuItem>
-        <DropdownMenuItem disabled>API</DropdownMenuItem>
-        <DropdownMenuSeparator />
+        <DropdownMenuLabel className="text-gray-500">Api</DropdownMenuLabel>
         <LogoutButton>
-          <DropdownMenuItem>
+          <DropdownMenuItem className="gap-3 bg-sky-500 text-white cursor-pointer hover:opacity-75 dark:bg-gray-800 rounded px-4 py-1">
+            <LogOut />
             Log out
-            <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>
           </DropdownMenuItem>
         </LogoutButton>
       </DropdownMenuContent>

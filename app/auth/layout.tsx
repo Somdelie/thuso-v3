@@ -1,6 +1,6 @@
 const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
   return (
-    <div className="flex min-h-screen justify-center items-center">
+    <div className="flex min-h-screen dark:bg-gray-800 justify-center items-center">
       {children}
     </div>
   );

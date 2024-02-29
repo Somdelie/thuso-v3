@@ -14,7 +14,7 @@ export const Header = ({ label }: HeaderProps) => {
   return (
     <div className="w-full flex flex-col items-center justify-center">
       <h1 className={cn("text-3xl font-semibold text-green")}>🔐Thuso.com</h1>
-      <p className="text-muted-foreground text-sm">{label}</p>
+      <p className="text-gray-600 dark:text-gray-400 mt-2 text-sm">{label}</p>
     </div>
   );
 };

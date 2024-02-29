@@ -67,6 +67,7 @@ export const Register = () => {
                       disabled={isPending}
                       placeholder="John Ndoe"
                       type="text"
+                      className="border-2 dark:border-gray-500 rounded"
                     />
                   </FormControl>
                   <FormMessage />
@@ -85,6 +86,7 @@ export const Register = () => {
                       disabled={isPending}
                       placeholder="somdelie@example.com"
                       type="email"
+                      className="border-2 dark:border-gray-500 rounded"
                     />
                   </FormControl>
                   <FormMessage />
@@ -103,6 +105,7 @@ export const Register = () => {
                       disabled={isPending}
                       placeholder="******"
                       type="password"
+                      className="border-2 dark:border-gray-500 rounded"
                     />
                   </FormControl>
                   <FormMessage />
@@ -112,7 +115,11 @@ export const Register = () => {
           </div>
           <FormError message={error} />
           <FormSuccess message={success} />
-          <Button type="submit" disabled={isPending} className="w-full">
+          <Button
+            type="submit"
+            disabled={isPending}
+            className="w-full bg-gray-950 rounded hover:bg-gray-900"
+          >
             {isPending ? "Please wait..." : "Create an account"}
           </Button>
         </form>
