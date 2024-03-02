@@ -13,7 +13,7 @@ export default function Social() {
   return (
     <div className="flex items-center gap-x-2 w-full">
       <Button
-        className="w-full dark:bg-gray-600 dark:text-gray-300 dark:hover:bg-gray-500 rounded"
+        className="w-full dark:bg-gray-600 bg-gray-300 dark:text-gray-300 dark:hover:bg-gray-500 rounded"
         size="lg"
         variant="outline"
         onClick={() => onClick("google")}
@@ -21,7 +21,7 @@ export default function Social() {
         <FcGoogle className="h-5 w-5" />
       </Button>
       <Button
-        className="w-full dark:bg-gray-600 dark:text-gray-300 dark:hover:bg-gray-500 rounded"
+        className="w-full dark:bg-gray-600 bg-gray-300 dark:text-gray-300 dark:hover:bg-gray-500 rounded"
         size="lg"
         variant="outline"
         onClick={() => onClick("github")}

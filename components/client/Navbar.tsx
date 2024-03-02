@@ -61,9 +61,9 @@ const Navbar = () => {
             ))}
             <MegaMenu />
           </div>
+          <ThemeSwitcher />
           {session.data ? (
             <div className="flex items-center gap-4">
-              <ThemeSwitcher />
               <div className="flex items-center gap-2 sm:gap-4">
                 <Link
                   href="/projects/create"

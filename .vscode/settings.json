@@ -28,7 +28,8 @@
         "Signin",
         "Somdelie",
         "Thuso",
-        "trpc"
+        "trpc",
+        "uuidv"
     ],
     
         "files.associations": {

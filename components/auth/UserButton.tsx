@@ -26,17 +26,22 @@ import {
   User,
 } from "lucide-react";
 import Link from "next/link";
+import { useCurrentUser } from "@/hooks/useCurrentUser";
+import { FaUser } from "react-icons/fa";
 
 export const UserButton = () => {
-  const session = useSession();
+  const user = useCurrentUser();
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger>
+      <DropdownMenuTrigger className="outline-none ring-0 focus:outline-none focus:ring-0 border-0 focus:border-0">
         <Avatar>
-          <AvatarImage src="" alt="@shadcn" />
+          <AvatarImage
+            src={user?.image || user?.name?.charAt(0)}
+            alt="@shadcn"
+          />
           <AvatarFallback className="text-white font-semibold">
-            {session?.data?.user?.name?.charAt(0)}
+            <FaUser />
           </AvatarFallback>
         </Avatar>
       </DropdownMenuTrigger>
@@ -102,9 +107,11 @@ export const UserButton = () => {
         <DropdownMenuSeparator />
         <DropdownMenuLabel className="text-gray-500">Api</DropdownMenuLabel>
         <LogoutButton>
-          <DropdownMenuItem className="gap-3 bg-sky-500 text-white cursor-pointer hover:opacity-75 dark:bg-gray-800 rounded px-4 py-1">
-            <LogOut />
-            Log out
+          <DropdownMenuItem>
+            <span className="gap-3 flex items-center w-full bg-sky-500 hover:bg-sky-600 text-white cursor-pointer hover:opacity-75 dark:bg-gray-800 rounded px-4 py-1">
+              <LogOut />
+              Log out
+            </span>
           </DropdownMenuItem>
         </LogoutButton>
       </DropdownMenuContent>
