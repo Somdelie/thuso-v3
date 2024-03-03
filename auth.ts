@@ -1,14 +1,27 @@
-import NextAuth, { Session } from "next-auth";
+import NextAuth, { DefaultSession, Session } from "next-auth";
 import authConfig from "@/auth.config";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import { db } from "@/lib/db";
 import { getUserById } from "@/data/user";
 import { getTwoFactorConfirmationByUserId } from "@/data/twoFactorConfirmation";
+import { UserRole } from "@prisma/client";
+import { getAccountByUserId } from "./data/accounts";
 
 // Define or import the User type
+
 type User = {
   id: string;
-  emailVerified?: boolean;
+  emailVerified?: Date | null; // Updated to match the type from getUserById
+  role?: string;
+  phone?: string;
+  status?: string;
+  address: {
+    street: string;
+    city: string;
+    state: string;
+    zip: string;
+  } | null;
+  isTwoFactorEnabled?: boolean;
   // ... other properties
 };
 
@@ -33,6 +46,10 @@ export const {
     },
   },
   callbacks: {
+    authorized({ request, auth }) {
+      console.log(auth);
+      return true;
+    },
     async signIn({ user, account }) {
       // Callback executed after successful sign-in
       // Allow without email verification for non-credentials provider
@@ -57,29 +74,54 @@ export const {
       }
       return true;
     },
-    async session({ token, session }) {
-      // Callback to modify the session data
-      if (token.sub && session.user) {
-        session.user.id = token.sub;
-      }
-
-      return session;
-    },
     async jwt({ token }) {
-      // Callback to modify the JSON Web Token (JWT) before encoding
+      // console.log("AM being called");
       if (!token.sub) return token;
 
       const existingUser = await getUserById(token.sub);
 
       if (!existingUser) return token;
 
-      // Add additional user properties to the token
+      const existingAccount = await getAccountByUserId(existingUser.id);
+
+      token.isOAuth = !!existingAccount;
+
       token.role = existingUser.role;
-      token.phone = existingUser.phone;
+      token.name = existingUser?.name;
+      token.phone = existingUser?.phone;
       token.status = existingUser.status;
       token.address = existingUser.address;
+      token.isTwoFactorEnabled = existingUser.isTwoFactorEnabled;
 
       return token;
+    },
+
+    async session({ token, session }) {
+      if (token.sub && session.user) {
+        session.user.id = token.sub;
+      }
+
+      if (token.role && session.user) {
+        session.user.role = token.role as UserRole;
+      }
+
+      if (token.status && session.user) {
+        session.user.status = token.status as string;
+      }
+
+      if (session.user) {
+        session.user.isTwoFactorEnabled = token.isTwoFactorEnabled as boolean;
+      }
+
+      if (session.user) {
+        session.user.name = token.name;
+        session.user.phone = token.phone as any;
+        session.user.isOAuth = token.isOAuth as boolean;
+        session.user.address = token.address as any;
+      }
+
+      // console.log(session);
+      return session;
     },
   },
   adapter: PrismaAdapter(db), // Prisma adapter for NextAuth

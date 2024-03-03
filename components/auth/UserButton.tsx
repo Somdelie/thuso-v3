@@ -28,6 +28,8 @@ import {
 import Link from "next/link";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { FaUser } from "react-icons/fa";
+import { RoleGate } from "./roleGate";
+import { UserRole } from "@prisma/client";
 
 export const UserButton = () => {
   const user = useCurrentUser();
@@ -60,18 +62,31 @@ export const UserButton = () => {
               Profile
             </Link>
           </DropdownMenuItem>
+          <RoleGate allowedRole={UserRole.ADMIN && UserRole.EDITOR}>
+            <DropdownMenuItem>
+              <Link
+                href="/admin"
+                className="hover:bg-sky-500 dark:hover:bg-gray-800 rounded transition flex items-center w-full gap-3 px-2 py-1"
+              >
+                <LayoutDashboard className="text-gray-500" />
+                Dashboard
+              </Link>
+            </DropdownMenuItem>
+          </RoleGate>
+          {/* {user?.role === "ADMIN" && (
+            <DropdownMenuItem>
+              <Link
+                href="/admin"
+                className="hover:bg-sky-500 dark:hover:bg-gray-800 rounded transition flex items-center w-full gap-3 px-2 py-1"
+              >
+                <LayoutDashboard className="text-gray-500" />
+                Dashboard
+              </Link>
+            </DropdownMenuItem>
+          )} */}
           <DropdownMenuItem>
             <Link
-              href="#"
-              className="hover:bg-sky-500 dark:hover:bg-gray-800 rounded transition flex items-center w-full gap-3 px-2 py-1"
-            >
-              <LayoutDashboard className="text-gray-500" />
-              Dashboard
-            </Link>
-          </DropdownMenuItem>
-          <DropdownMenuItem>
-            <Link
-              href="#"
+              href="/settings"
               className="hover:bg-sky-500 dark:hover:bg-gray-800 rounded transition flex items-center w-full gap-3 px-2 py-1"
             >
               <Settings className="text-gray-500" />

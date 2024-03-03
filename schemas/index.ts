@@ -1,4 +1,5 @@
 import * as z from "zod";
+import validator from "validator";
 
 // Login Schema for validating login input
 export const LoginSchema = z.object({
@@ -12,9 +13,34 @@ export const LoginSchema = z.object({
 });
 
 // Settings Schema for Updating user info
-export const SettingsSchema = z.object({
-  name: z.optional(z.string()),
-});
+export const SettingsSchema = z
+  .object({
+    name: z.string().optional(),
+    isTwoFactorEnabled: z.boolean().optional(),
+    phone: z.optional(
+      z.string().refine(validator.isMobilePhone, {
+        message: "Invalid phone number",
+      })
+    ),
+    password: z.optional(z.string().min(6)),
+    newPassword: z.optional(z.string().min(6)),
+  })
+  .refine(
+    (data: any) => {
+      if (!data || (data.password && !data.newPassword)) {
+        return false;
+      }
+
+      if (data.newPassword && !data.password) {
+        return false;
+      }
+      return true;
+    },
+    {
+      message: "New password is required",
+      path: ["newPassword"],
+    }
+  );
 
 // Reset Schema for validating email during password reset
 export const ResetSchema = z.object({
