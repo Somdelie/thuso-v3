@@ -6,6 +6,7 @@ import { getUserById } from "@/data/user";
 import { getTwoFactorConfirmationByUserId } from "@/data/twoFactorConfirmation";
 import { UserRole } from "@prisma/client";
 import { getAccountByUserId } from "./data/accounts";
+import { NextApiResponse } from "next";
 
 // Define or import the User type
 
@@ -45,85 +46,81 @@ export const {
       });
     },
   },
-  callbacks: {
-    authorized({ request, auth }) {
-      console.log(auth);
-      return true;
-    },
-    async signIn({ user, account }) {
-      // Callback executed after successful sign-in
-      // Allow without email verification for non-credentials provider
-      if (!user || account?.provider !== "credentials") return true;
+  // callbacks: {
+  //   async signIn({ user, account }): Promise<boolean> {
+  //     // Callback executed after successful sign-in
+  //     // Allow without email verification for non-credentials provider
+  //     if (!user || account?.provider !== "credentials") return true;
 
-      const existingUser = await getUserById((user as User).id);
+  //     const existingUser = await getUserById((user as User).id);
 
-      // Prevent sign-in without email verification
-      if (!existingUser?.emailVerified) return false;
+  //     // Prevent sign-in without email verification
+  //     if (!existingUser?.emailVerified) return false;
 
-      if (existingUser.isTwoFactorEnabled) {
-        const twoFactorConfirmation = await getTwoFactorConfirmationByUserId(
-          existingUser.id
-        );
+  //     if (existingUser.isTwoFactorEnabled) {
+  //       const twoFactorConfirmation = await getTwoFactorConfirmationByUserId(
+  //         existingUser.id
+  //       );
 
-        if (!twoFactorConfirmation) return false;
+  //       if (!twoFactorConfirmation) return false;
 
-        // Delete two-factor confirmation for the next sign-in
-        await db.twoFactorConfirmation.delete({
-          where: { id: twoFactorConfirmation.id },
-        });
-      }
-      return true;
-    },
-    async jwt({ token }) {
-      // console.log("AM being called");
-      if (!token.sub) return token;
+  //       // Delete two-factor confirmation for the next sign-in
+  //       await db.twoFactorConfirmation.delete({
+  //         where: { id: twoFactorConfirmation.id },
+  //       });
+  //     }
+  //     return true;
+  //   },
+  //   async jwt({ token }): Promise<Record<string, unknown>> {
+  //     // console.log("AM being called");
+  //     if (!token.sub) return token;
 
-      const existingUser = await getUserById(token.sub);
+  //     const existingUser = await getUserById(token.sub);
 
-      if (!existingUser) return token;
+  //     if (!existingUser) return token;
 
-      const existingAccount = await getAccountByUserId(existingUser.id);
+  //     const existingAccount = await getAccountByUserId(existingUser.id);
 
-      token.isOAuth = !!existingAccount;
+  //     token.isOAuth = !!existingAccount;
 
-      token.role = existingUser.role;
-      token.name = existingUser?.name;
-      token.phone = existingUser?.phone;
-      token.status = existingUser.status;
-      token.address = existingUser.address;
-      token.isTwoFactorEnabled = existingUser.isTwoFactorEnabled;
+  //     token.role = existingUser.role;
+  //     token.name = existingUser?.name;
+  //     token.phone = existingUser?.phone;
+  //     token.status = existingUser.status;
+  //     token.address = existingUser.address;
+  //     token.isTwoFactorEnabled = existingUser.isTwoFactorEnabled;
 
-      return token;
-    },
+  //     return token;
+  //   },
 
-    async session({ token, session }) {
-      if (token.sub && session.user) {
-        session.user.id = token.sub;
-      }
+  //   async session({ token, session }) {
+  //     if (token.sub && session.user) {
+  //       session.user.id = token.sub;
+  //     }
 
-      if (token.role && session.user) {
-        session.user.role = token.role as UserRole;
-      }
+  //     if (token.role && session.user) {
+  //       session.user.role = token.role as UserRole;
+  //     }
 
-      if (token.status && session.user) {
-        session.user.status = token.status as string;
-      }
+  //     if (token.status && session.user) {
+  //       session.user.status = token.status as string;
+  //     }
 
-      if (session.user) {
-        session.user.isTwoFactorEnabled = token.isTwoFactorEnabled as boolean;
-      }
+  //     if (session.user) {
+  //       session.user.isTwoFactorEnabled = token.isTwoFactorEnabled as boolean;
+  //     }
 
-      if (session.user) {
-        session.user.name = token.name;
-        session.user.phone = token.phone as any;
-        session.user.isOAuth = token.isOAuth as boolean;
-        session.user.address = token.address as any;
-      }
+  //     if (session.user) {
+  //       session.user.name = token.name;
+  //       session.user.phone = token.phone as any;
+  //       session.user.isOAuth = token.isOAuth as boolean;
+  //       session.user.address = token.address as any;
+  //     }
 
-      // console.log(session);
-      return session;
-    },
-  },
+  //     // console.log(session);
+  //     return session;
+  //   },
+  // },
   adapter: PrismaAdapter(db), // Prisma adapter for NextAuth
   session: { strategy: "jwt" }, // Session strategy using JWT
   ...authConfig, // Additional authentication configurations

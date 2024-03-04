@@ -2,9 +2,13 @@ import credentials from "next-auth/providers/credentials";
 import type { NextAuthConfig } from "next-auth";
 import { LoginSchema } from "@/schemas";
 import bcrypt from "bcryptjs";
-import { getUserByEmail } from "./data/user";
+import { getUserByEmail, getUserById } from "./data/user";
 import Github from "next-auth/providers/github";
 import Google from "next-auth/providers/google";
+import { UserRole } from "@prisma/client";
+import { getAccountByUserId } from "./data/accounts";
+import { db } from "./lib/db";
+import { getTwoFactorConfirmationByUserId } from "./data/twoFactorConfirmation";
 
 // Define or import the User type
 type User = {
@@ -47,64 +51,103 @@ export default {
       },
     }),
   ],
+  callbacks: {
+    authorized({ request, auth }) {
+      const user = auth?.user;
+      const isOnAdmin = request.nextUrl.pathname.startsWith("/admin");
+      const isOnAuthRoute = request.nextUrl.pathname.startsWith("/auth");
 
-  // callbacks: {
-  //   async signIn({ user, account }) {
-  //     // Callback executed after successful sign-in
-  //     // Allow without email verification for non-credentials provider
-  //     if (!user || account?.provider !== "credentials") return true;
+      const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "";
 
-  //     const existingUser = await getUserById((user as User).id);
+      if (isOnAdmin && !user) {
+        return Response.redirect(`${baseUrl}/auth/login`);
+      }
 
-  //     // Prevent sign-in without email verification
-  //     if (!existingUser?.emailVerified) return false;
+      // Redirect to 404 page if not an admin
+      if (
+        isOnAdmin &&
+        user &&
+        !(user.role === "ADMIN" || user.role === "EDITOR")
+      ) {
+        return Response.redirect(`${baseUrl}/not-found`);
+      }
 
-  //     if (existingUser.isTwoFactorEnabled) {
-  //       const twoFactorConfirmation = await getTwoFactorConfirmationByUserId(
-  //         existingUser.id
-  //       );
+      if (isOnAuthRoute && user) {
+        return Response.redirect(`${baseUrl}/`);
+      }
+    },
+    async signIn({ user, account }): Promise<boolean> {
+      // Callback executed after successful sign-in
+      // Allow without email verification for non-credentials provider
+      if (!user || account?.provider !== "credentials") return true;
 
-  //       if (!twoFactorConfirmation) return false;
+      const existingUser = await getUserById((user as User).id);
 
-  //       // Delete two-factor confirmation for the next sign-in
-  //       await db.twoFactorConfirmation.delete({
-  //         where: { id: twoFactorConfirmation.id },
-  //       });
-  //     }
-  //     return true;
-  //   },
-  //   async jwt({ token }) {
-  //     // Callback to modify the JSON Web Token (JWT) before encoding
-  //     if (!token.sub) return token;
+      // Prevent sign-in without email verification
+      if (!existingUser?.emailVerified) return false;
 
-  //     const existingUser = await getUserById(token.sub);
+      if (existingUser.isTwoFactorEnabled) {
+        const twoFactorConfirmation = await getTwoFactorConfirmationByUserId(
+          existingUser.id
+        );
 
-  //     if (!existingUser) return token;
+        if (!twoFactorConfirmation) return false;
 
-  //     // Add additional user properties to the token
-  //     token.role = existingUser.role;
-  //     token.phone = existingUser.phone;
-  //     token.status = existingUser.status;
-  //     token.address = existingUser.address;
-  //     token.isTwoFactorEnabled = existingUser.isTwoFactorEnabled;
+        // Delete two-factor confirmation for the next sign-in
+        await db.twoFactorConfirmation.delete({
+          where: { id: twoFactorConfirmation.id },
+        });
+      }
+      return true;
+    },
+    async jwt({ token }): Promise<Record<string, unknown>> {
+      // console.log("AM being called");
+      if (!token.sub) return token;
 
-  //     return token;
-  //   },
+      const existingUser = await getUserById(token.sub);
 
-  //   async session({ token, session }) {
-  //     if (token.sub && session.user) {
-  //       session.user.id = token.sub as string;
-  //     }
+      if (!existingUser) return token;
 
-  //     if (session.user) {
-  //       const userId = token.sub as string | undefined;
-  //       if (userId) {
-  //         const existingUser = await getUserById(userId);
-  //       }
-  //     }
+      const existingAccount = await getAccountByUserId(existingUser.id);
 
-  //     console.log(session);
-  //     return session;
-  //   },
-  // },
+      token.isOAuth = !!existingAccount;
+
+      token.role = existingUser.role;
+      token.name = existingUser?.name;
+      token.phone = existingUser?.phone;
+      token.status = existingUser.status;
+      token.address = existingUser.address;
+      token.isTwoFactorEnabled = existingUser.isTwoFactorEnabled;
+
+      return token;
+    },
+
+    async session({ token, session }) {
+      if (token.sub && session.user) {
+        session.user.id = token.sub;
+      }
+
+      if (token.role && session.user) {
+        session.user.role = token.role as UserRole;
+      }
+
+      if (token.status && session.user) {
+        session.user.status = token.status as string;
+      }
+
+      if (session.user) {
+        session.user.isTwoFactorEnabled = token.isTwoFactorEnabled as boolean;
+      }
+
+      if (session.user) {
+        session.user.name = token.name;
+        session.user.phone = token.phone as any;
+        session.user.isOAuth = token.isOAuth as boolean;
+        session.user.address = token.address as any;
+      }
+
+      // console.log(session);
+      return session;
+    },
+  },
 } satisfies NextAuthConfig;
