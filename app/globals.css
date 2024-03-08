@@ -15,6 +15,13 @@
   --background-end-rgb: 255, 255, 255;
 }
 
+@layer base {
+  :root {
+    --muted: 210 40% 96.1%;
+    --borderLight: var(--textColor);
+  }
+}
+
 html {
   scroll-snap-type: mandatory;
   scroll-behavior: smooth;
@@ -256,8 +263,10 @@ a:hover {
 }
 
 .search {
-  box-shadow: rgba(0, 0, 0, 0.4) 0px 2px 4px,
-    rgba(0, 0, 0, 0.3) 0px 7px 13px -3px, rgba(0, 0, 0, 0.2) 0px -3px 0px inset;
+  box-shadow:
+    rgba(0, 0, 0, 0.4) 0px 2px 4px,
+    rgba(0, 0, 0, 0.3) 0px 7px 13px -3px,
+    rgba(0, 0, 0, 0.2) 0px -3px 0px inset;
 }
 
 /* admin-panel */
@@ -287,7 +296,8 @@ a:hover {
 }
 
 .smallCard {
-  box-shadow: rgba(60, 64, 67, 0.3) 0px 1px 2px 0px,
+  box-shadow:
+    rgba(60, 64, 67, 0.3) 0px 1px 2px 0px,
     rgba(60, 64, 67, 0.15) 0px 2px 6px 2px;
 }
 
@@ -324,4 +334,9 @@ a:hover {
 
 .css-az8st9-MuiDataGrid-root .MuiDataGrid-withBorderColor {
   border: none !important;
+}
+
+.rdw-editor-toolbar {
+  background-color: #374151;
+  @apply bg-gray-700;
 }

@@ -1,5 +1,6 @@
 import * as z from "zod";
 import validator from "validator";
+import { jobTypes, locationTypes } from "@/lib/job-types";
 
 // Login Schema for validating login input
 export const LoginSchema = z.object({
@@ -73,3 +74,24 @@ export const RegisterSchema = z.object({
       message: "Name must be less than 50 characters",
     }),
 });
+
+const requiredString = z.string().min(2, "Required");
+const numericRequiredString = requiredString.regex(/^\d+$/, "Must be a number");
+
+export const createJobSchema = z.object({
+  title: requiredString.max(100),
+  type: requiredString.max(50),
+  description: z.string().max(5000).optional(),
+  salary: numericRequiredString.max(9, "Number can't be longer than 9 digits"),
+  locationType: requiredString,
+  location: z.string().optional(),
+});
+
+export const jobFilterSchema = z.object({
+  q: z.string().optional(),
+  type: z.string().optional(),
+  location: z.string().optional(),
+  remote: z.coerce.boolean().optional(),
+});
+
+export type JobFilterValues = z.infer<typeof jobFilterSchema>;
