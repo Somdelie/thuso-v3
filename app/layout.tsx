@@ -4,6 +4,9 @@ import { auth } from "@/auth";
 import { SessionProvider } from "next-auth/react";
 import { Providers } from "@/context/Providers";
 import "react-quill/dist/quill.snow.css";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { Toaster } from "react-hot-toast";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -24,6 +27,9 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const session = await auth();
+  // const user = await currentUser();
+
+  // console.log(user);
 
   return (
     <SessionProvider session={session}>
@@ -32,6 +38,8 @@ export default async function RootLayout({
           className={`${inter.className} bg-gradient-to-b from-gray-300 to-white dark:from-gray-800 dark:to-gray-800 dark:bg-gray-800 transition `}
         >
           <Providers>
+            <ToastContainer />
+            <Toaster position="top-center" reverseOrder={false} />
             <main className="min-h-screen">{children}</main>
           </Providers>
         </body>

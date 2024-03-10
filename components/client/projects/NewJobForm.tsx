@@ -20,9 +20,10 @@ import LocationInput from "@/components/ui/LocationInput";
 import React, { useEffect, useRef, useState, useTransition } from "react";
 import RichTextEditor from "@/components/ui/RichTextEditor";
 import { draftToMarkdown } from "markdown-draft-js";
-import { create } from "@/actions/create-job";
-import { FormError } from "@/components/FormError";
-import { FormSuccess } from "@/components/FormSuccess";
+import axios from "axios";
+import { CircularProgress } from "@mui/material";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 export const NewJobForm = () => {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -46,37 +47,63 @@ export const NewJobForm = () => {
     };
   }, []);
 
+  const notifySuccess = (message: any) => {
+    toast.success(message, {
+      position: "top-right",
+      autoClose: 3000, // Close the toast after 3 seconds
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+    });
+  };
+
   const { setFocus } = form;
 
-  const onSubmit = (values: z.infer<typeof createJobSchema>) => {
+  const onSubmit = async (values: z.infer<typeof createJobSchema>) => {
     if (form.watch("locationType") === "On-site" && !values.location) {
       // Display an error message or handle it as needed
       setErrorMessage("Location is required");
       return;
     }
+
+    // try {
+    //   const data = await axios.post("/api/jobs", values);
+    // } catch (error) {
+    //   console.log(error);
+    // }
     // If no error, proceed with form submission
     setErrorMessage(null);
-    startTransition(() => {
-      create(values)
-        .then((data: any) => {
-          if (data?.error) {
-            form.reset();
-            setError(data.error);
-          }
+    startTransition(async () => {
+      try {
+        const response = await axios.post("/api/jobs", values);
+        const data = response.data;
 
-          if (data?.success) {
-            form.reset();
-            setSuccess(data.success);
-          }
-        })
-        .catch(() => setError("Something went wrong!"));
+        if (data.error) {
+          form.reset();
+          setError(data.error);
+          toast.error(data.error); // Display error message using React Toastify
+        }
+
+        if (data.success) {
+          form.reset();
+          setSuccess(data.success);
+          notifySuccess("Job created successfully!");
+        }
+      } catch (error) {
+        setError("Something went wrong!");
+        toast.error("Something went wrong!"); // Display error message using React Toastify
+      }
     });
-
-    console.log(values);
   };
+
+  const notify = () => toast("Wow so easy!");
 
   return (
     <main className="max-w-3xl m-auto my-16 space-y-10">
+      <button onClick={notify}>Notify!</button>
+      <ToastContainer />
       <div className="space-y-5 text-center mt-6">
         <h1 className="text-2xl dark:text-gray-300 font-semibold sm:text-4xl">
           Find your perfect candidate
@@ -123,6 +150,7 @@ export const NewJobForm = () => {
                     <FormControl>
                       <Input
                         placeholder="e.g. painter"
+                        disabled={isPending}
                         className="dark:border-gray-500 border-gray-400 rounded dark:text-gray-400"
                         {...field}
                       />
@@ -138,7 +166,7 @@ export const NewJobForm = () => {
                   <FormItem>
                     <FormLabel>Job type</FormLabel>
                     <FormControl className="w-full">
-                      <Select {...field}>
+                      <Select {...field} disabled={isPending}>
                         <option value="" hidden>
                           Select an option
                         </option>
@@ -166,7 +194,7 @@ export const NewJobForm = () => {
                   <FormItem>
                     <FormLabel>Location</FormLabel>
                     <FormControl className="w-full">
-                      <Select {...field}>
+                      <Select {...field} disabled={isPending}>
                         <option value="" hidden>
                           Select an option
                         </option>
@@ -197,6 +225,7 @@ export const NewJobForm = () => {
                         <LocationInput
                           onLocationSelected={field.onChange}
                           ref={field.ref}
+                          disabled={isPending}
                         />
                       </FormControl>
                       {errorMessage && (
@@ -217,6 +246,7 @@ export const NewJobForm = () => {
                       <Input
                         placeholder="4000"
                         type="number"
+                        disabled={isPending}
                         className="dark:border-gray-500 border-gray-400 rounded dark:text-gray-400"
                         {...field}
                       />
@@ -225,54 +255,6 @@ export const NewJobForm = () => {
                   </FormItem>
                 )}
               />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="applicationEmail">How to apply</Label>
-              <div className="grid sm:grid-cols-2">
-                {/* <FormField
-                  control={control}
-                  name="applicationEmail"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormControl>
-                        <div className="sm:flex items-center">
-                          <Input
-                            id="applicationEmail"
-                            type="email"
-                            placeholder="url"
-                            className="dark:border-gray-500 border-gray-400 rounded dark:text-gray-400"
-                            {...field}
-                          />
-                          <span className="mx-2">or</span>
-                        </div>
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={control}
-                  name="applicationUrl"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormControl>
-                        <Input
-                          type="url"
-                          placeholder="Website"
-                          className="dark:border-gray-500 border-gray-400 rounded dark:text-gray-400"
-                          {...field}
-                          onChange={(e) => {
-                            field.onChange(e);
-                            trigger("applicationEmail");
-                          }}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                /> */}
-              </div>
             </div>
 
             <div className="mt-2">
@@ -298,14 +280,26 @@ export const NewJobForm = () => {
               />
             </div>
 
-            <FormError message={error} />
-            <FormSuccess message={success} />
             <Button
+              type="submit"
+              disabled={isPending}
+              className="mt-6 bg-gray-950 rounded hover:bg-gray-900"
+            >
+              {isPending ? (
+                <span className="flex items-center gap-2">
+                  <CircularProgress size={16} /> Please wait...
+                </span>
+              ) : (
+                "Submit"
+              )}
+            </Button>
+
+            {/* <Button
               type="submit"
               className="mt-6 text-gray-300 bg-gray-950 dark:bg-sky-600 dark:hover:bg-sky-700 rounded hover:bg-gray-900"
             >
               Submit your form
-            </Button>
+            </Button> */}
           </form>
         </Form>
       </div>

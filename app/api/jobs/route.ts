@@ -1,19 +1,10 @@
-import * as z from "zod";
 import { currentUser } from "@/lib/auth";
 import { db } from "@/lib/db";
-import { createJobSchema } from "@/schemas";
 import { NextResponse } from "next/server";
 
-export async function create(
-  values: z.infer<typeof createJobSchema>,
-  req: Request
-) {
-  const validatedFields = createJobSchema.safeParse(values);
-
-  if (!validatedFields.success) {
-    return { error: "Invalid fields" };
-  }
+export async function POST(req: Request) {
   const user = await currentUser();
+  // console.log(user);
 
   try {
     if (!user?.email) {
@@ -30,11 +21,6 @@ export async function create(
     //   user,
     //   title,
     //   description,
-    //   locationType,
-    //   salary,
-    //   type,
-    //   author,
-    //   location,
     // });
 
     const newJob = await db.job.create({

@@ -117,6 +117,7 @@ export default {
       token.phone = existingUser?.phone;
       token.status = existingUser.status;
       token.address = existingUser.address;
+      // token.job = existingUser.
       token.isTwoFactorEnabled = existingUser.isTwoFactorEnabled;
 
       return token;

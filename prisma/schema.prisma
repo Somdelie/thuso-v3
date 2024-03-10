@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -53,6 +50,7 @@ model User {
 
   accounts                Account[]
   twoFactorConfirmationId String?   @db.ObjectId
+  jobs                    Job[] // Each user can have multiple jobs
 }
 
 // Address is an embedded document
@@ -106,7 +104,6 @@ model TwoFactorConfirmation {
 
 model Job {
   id           String   @id @default(auto()) @map("_id") @db.ObjectId
-  // slug             String   @unique
   title        String
   type         String
   locationType String
@@ -117,5 +114,6 @@ model Job {
   createdAt    DateTime @default(now())
   updatedAt    DateTime @default(now())
 
-  @@map("jobs")
+  authorEmail String? // Reference to the user who owns the job
+  author      User?   @relation(fields: [authorEmail], references: [email])
 }
