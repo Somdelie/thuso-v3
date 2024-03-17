@@ -10,6 +10,7 @@ import { Banknote, Globe2, MapPin } from "lucide-react";
 
 interface JobListItemProps {
   job: Job;
+  author?: any;
 }
 
 const variants = {
@@ -17,19 +18,7 @@ const variants = {
   visible: { y: 0, opacity: 1, transition: { duration: 1 } },
 };
 
-export default function JobListItem({
-  job: {
-    title,
-    type,
-    salary,
-    approved,
-    createdAt,
-    description,
-    id,
-    location,
-    locationType,
-  },
-}: JobListItemProps) {
+export default function JobListItem() {
   const ref = useRef<HTMLDivElement>(null);
   const isInView = useInView(ref, { margin: "-100px" });
 
@@ -40,38 +29,7 @@ export default function JobListItem({
       whileInView="visible"
       animate={isInView && "animation"}
       className=" bg-white dark:bg-gray-700 p-4 dark:text-gray-400"
-    >
-      <span className="text-roseRed font-semibold">{title}</span>
-      <div className="flex gap-2 ">
-        <Link href="#">
-          <p className="text-[14px]">{description?.slice(0, 65)}...</p>
-          <span className="text-xs text-gray-500 flex gap-1 items-center mt-2">
-            <MapPin size={16} />
-            {locationType}
-          </span>
-          <span className="text-xs text-gray-500 flex gap-1 items-center mt-2">
-            <Globe2 size={16} />
-            {location || "Worldwide"}
-          </span>
-          <span className="text-xs text-gray-500 flex gap-1 items-center mt-2">
-            <Banknote size={16} />
-            {type}
-          </span>
-        </Link>
-      </div>
-      <Divider sx={{ borderColor: "gray", marginY: 2 }} />
-      <div className="flex items-center justify-between">
-        <div className="flex items-center justify-between ">
-          <div className="flex items-center gap-2 ">
-            <span className="">posted by:</span>
-            <h1>John Ndoe</h1>
-          </div>
-        </div>
-        <button className="bg-roseRed2 dark:bg-gray-900 hover:bg-transparent transition hover:text-roseRed2 hover:border-roseRed2 border border-gray-800 text-gray-100 px-2 py-1 rounded">
-          Send Proposal
-        </button>
-      </div>
-    </motion.div>
+    ></motion.div>
   );
 }
 

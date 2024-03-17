@@ -32,6 +32,11 @@ model Account {
   @@unique([provider, providerAccountId])
 }
 
+enum UserType {
+  NORMAL
+  FREELANCER
+}
+
 model User {
   id                    String                 @id @default(auto()) @map("_id") @db.ObjectId
   email                 String                 @unique
@@ -39,9 +44,14 @@ model User {
   phone                 String?
   image                 String?
   status                UserStatus             @default(ACTIVE)
+  userType              UserType               @default(NORMAL)
+  isAproved             Boolean                @default(false)
   role                  UserRole               @default(USER)
   emailVerified         DateTime?
   address               Address?
+  about                 String?
+  jobType               String?
+  documentPhoto         String?
   password              String?
   isTwoFactorEnabled    Boolean                @default(false)
   twoFactorConfirmation TwoFactorConfirmation?

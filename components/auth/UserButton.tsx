@@ -62,7 +62,8 @@ export const UserButton = () => {
               Profile
             </Link>
           </DropdownMenuItem>
-          <RoleGate allowedRole={UserRole.ADMIN && UserRole.EDITOR}>
+
+          {user?.role === "ADMIN" && (
             <DropdownMenuItem>
               <Link
                 href="/admin"
@@ -72,18 +73,7 @@ export const UserButton = () => {
                 Dashboard
               </Link>
             </DropdownMenuItem>
-          </RoleGate>
-          {/* {user?.role === "ADMIN" && (
-            <DropdownMenuItem>
-              <Link
-                href="/admin"
-                className="hover:bg-sky-500 dark:hover:bg-gray-800 rounded transition flex items-center w-full gap-3 px-2 py-1"
-              >
-                <LayoutDashboard className="text-gray-500" />
-                Dashboard
-              </Link>
-            </DropdownMenuItem>
-          )} */}
+          )}
           <DropdownMenuItem>
             <Link
               href="/settings"
@@ -97,7 +87,7 @@ export const UserButton = () => {
         <DropdownMenuLabel className="text-gray-500">
           Quick Access
         </DropdownMenuLabel>
-        <DropdownMenuSeparator />
+
         <DropdownMenuGroup className="border-b dark:border-gray-500">
           <DropdownMenuItem>
             <Link
@@ -118,8 +108,7 @@ export const UserButton = () => {
             </Link>
           </DropdownMenuItem>
         </DropdownMenuGroup>
-        <DropdownMenuSeparator />
-        <DropdownMenuSeparator />
+
         <DropdownMenuLabel className="text-gray-500">Api</DropdownMenuLabel>
         <LogoutButton>
           <DropdownMenuItem>

@@ -1,8 +1,12 @@
-import { UserRole } from "@prisma/client";
+import { UserRole, UserStatus, UserType } from "@prisma/client";
 import NextAuth, { type DefaultSession } from "next-auth";
 
 export type ExtendedUser = DefaultSession["user"] & {
   role: UserRole;
+  userType: UserType;
+  userStatus: UserStatus;
+  about: string | null;
+  jobType: string | null;
   phone: string | null;
   status?: string | null;
   address: {

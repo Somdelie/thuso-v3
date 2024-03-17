@@ -13,10 +13,18 @@ export const LoginSchema = z.object({
   code: z.optional(z.string()), // Optional field for two-factor authentication code
 });
 
+export const EditUserSchema = z.object({
+  isAproved: z.boolean(),
+  role: z.enum(["ADMIN", "USER", "EDITOR"]).optional(),
+  status: z.enum(["ACTIVE", "BLOCKED"]).optional(),
+  userType: z.enum(["NORMAL", "FREELANCER"]).optional(),
+});
 // Settings Schema for Updating user info
 export const SettingsSchema = z
   .object({
     name: z.string().optional(),
+    about: z.string().optional(),
+    jobType: z.string().optional(),
     isTwoFactorEnabled: z.boolean().optional(),
     phone: z.optional(
       z.string().refine(validator.isMobilePhone, {
@@ -25,20 +33,27 @@ export const SettingsSchema = z
     ),
     password: z.optional(z.string().min(6)),
     newPassword: z.optional(z.string().min(6)),
+    userType: z.enum(["NORMAL", "FREELANCER"]).optional(),
+    address: z
+      .object({
+        street: z.string().optional(),
+        city: z.string().optional(),
+        state: z.string().optional(),
+        zip: z.string().optional(),
+      })
+      .optional(),
   })
   .refine(
     (data: any) => {
-      if (!data || (data.password && !data.newPassword)) {
-        return false;
-      }
-
+      // If newPassword is provided, password must also be provided
       if (data.newPassword && !data.password) {
         return false;
       }
+
       return true;
     },
     {
-      message: "New password is required",
+      message: "New password is required when changing password",
       path: ["newPassword"],
     }
   );

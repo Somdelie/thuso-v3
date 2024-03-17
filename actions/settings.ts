@@ -1,10 +1,9 @@
 "use server";
-
 import * as z from "zod";
+import { SettingsSchema } from "@/schemas";
 import { getUserById } from "@/data/user";
 import { currentUser } from "@/lib/auth";
 import { db } from "@/lib/db";
-import { SettingsSchema } from "@/schemas";
 import bcrypt from "bcryptjs";
 
 export const settings = async (values: z.infer<typeof SettingsSchema>) => {
@@ -13,6 +12,13 @@ export const settings = async (values: z.infer<typeof SettingsSchema>) => {
   if (!user) {
     return { error: "Unauthorized" };
   }
+
+  const defaultAddress = {
+    street: user?.address?.street || "",
+    city: user?.address?.city || "",
+    state: user?.address?.state || "",
+    zip: user?.address?.zip || "",
+  };
 
   // Check if user.id is defined
   if (user.id === undefined) {
@@ -46,11 +52,14 @@ export const settings = async (values: z.infer<typeof SettingsSchema>) => {
     (values.password = hashedPassword), (values.newPassword = undefined);
   }
 
+  const updatedData = {
+    ...values,
+    address: { ...defaultAddress, ...values.address }, // Merge defaultAddress with provided address
+  };
+
   await db.user.update({
     where: { id: dbUser.id },
-    data: {
-      ...values,
-    },
+    data: updatedData,
   });
 
   return { success: "Settings Updated!" };

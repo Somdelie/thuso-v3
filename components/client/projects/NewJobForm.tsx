@@ -22,8 +22,9 @@ import RichTextEditor from "@/components/ui/RichTextEditor";
 import { draftToMarkdown } from "markdown-draft-js";
 import axios from "axios";
 import { CircularProgress } from "@mui/material";
-import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import toast from "react-hot-toast";
+import { ToastContainer } from "react-toastify";
 
 export const NewJobForm = () => {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -47,18 +48,6 @@ export const NewJobForm = () => {
     };
   }, []);
 
-  const notifySuccess = (message: any) => {
-    toast.success(message, {
-      position: "top-right",
-      autoClose: 3000, // Close the toast after 3 seconds
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-    });
-  };
-
   const { setFocus } = form;
 
   const onSubmit = async (values: z.infer<typeof createJobSchema>) => {
@@ -67,13 +56,6 @@ export const NewJobForm = () => {
       setErrorMessage("Location is required");
       return;
     }
-
-    // try {
-    //   const data = await axios.post("/api/jobs", values);
-    // } catch (error) {
-    //   console.log(error);
-    // }
-    // If no error, proceed with form submission
     setErrorMessage(null);
     startTransition(async () => {
       try {
@@ -81,28 +63,26 @@ export const NewJobForm = () => {
         const data = response.data;
 
         if (data.error) {
-          form.reset();
-          setError(data.error);
-          toast.error(data.error); // Display error message using React Toastify
+          toast.error(data.message);
+        } else {
+          console.log("Job created");
+          toast.success(data.message);
         }
-
-        if (data.success) {
-          form.reset();
-          setSuccess(data.success);
-          notifySuccess("Job created successfully!");
+      } catch (error: any) {
+        if (error.response && error.response.status === 401) {
+          // Handle unauthorized access (user not logged in)
+          // console.log("log in first");
+          toast.error("You need to log in to continue.");
+        } else {
+          console.error("Error creating job:", error);
+          toast.error("An error occurred while creating the job.");
         }
-      } catch (error) {
-        setError("Something went wrong!");
-        toast.error("Something went wrong!"); // Display error message using React Toastify
       }
     });
   };
 
-  const notify = () => toast("Wow so easy!");
-
   return (
     <main className="max-w-3xl m-auto my-16 space-y-10">
-      <button onClick={notify}>Notify!</button>
       <ToastContainer />
       <div className="space-y-5 text-center mt-6">
         <h1 className="text-2xl dark:text-gray-300 font-semibold sm:text-4xl">

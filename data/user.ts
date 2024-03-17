@@ -21,3 +21,15 @@ export const getUserById = async (id: string) => {
     return null;
   }
 };
+
+export const getJobById = async (id: string) => {
+  try {
+    const job = await db.job.findUnique({
+      where: { id },
+      include: { author: true },
+    });
+    return job;
+  } catch {
+    return null;
+  }
+};

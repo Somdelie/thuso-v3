@@ -5,7 +5,7 @@ import bcrypt from "bcryptjs";
 import { getUserByEmail, getUserById } from "./data/user";
 import Github from "next-auth/providers/github";
 import Google from "next-auth/providers/google";
-import { UserRole } from "@prisma/client";
+import { UserRole, UserType } from "@prisma/client";
 import { getAccountByUserId } from "./data/accounts";
 import { db } from "./lib/db";
 import { getTwoFactorConfirmationByUserId } from "./data/twoFactorConfirmation";
@@ -15,6 +15,8 @@ type User = {
   id: string;
   emailVerified?: boolean;
   role?: string;
+  about?: string;
+  jobType?: string;
   phone?: string; // Add the phone property
   status?: string; // Add the status property
   address?: string; // Add the address property
@@ -114,9 +116,12 @@ export default {
 
       token.role = existingUser.role;
       token.name = existingUser?.name;
+      token.about = existingUser.about;
+      token.jobType = existingUser.jobType;
       token.phone = existingUser?.phone;
       token.status = existingUser.status;
       token.address = existingUser.address;
+      token.userType = existingUser.userType;
       // token.job = existingUser.
       token.isTwoFactorEnabled = existingUser.isTwoFactorEnabled;
 
@@ -132,8 +137,16 @@ export default {
         session.user.role = token.role as UserRole;
       }
 
+      if (token.userType && session.user) {
+        session.user.userType = token.userType as UserType;
+      }
+
       if (token.status && session.user) {
         session.user.status = token.status as string;
+      }
+
+      if (token.about && session.user) {
+        session.user.about = token.about as string;
       }
 
       if (session.user) {
@@ -143,8 +156,11 @@ export default {
       if (session.user) {
         session.user.name = token.name;
         session.user.phone = token.phone as any;
+        session.user.about = token.about as any;
+        session.user.jobType = token.jobType as any;
         session.user.isOAuth = token.isOAuth as boolean;
         session.user.address = token.address as any;
+        session.user.userType = token.userType as UserType;
       }
 
       // console.log(session);
