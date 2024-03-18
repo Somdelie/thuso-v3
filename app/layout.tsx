@@ -35,7 +35,7 @@ export default async function RootLayout({
     <SessionProvider session={session}>
       <html lang="en">
         <body
-          className={`${inter.className} bg-gradient-to-b from-gray-300 to-white dark:from-gray-800 dark:to-gray-800 dark:bg-gray-800 transition `}
+          className={`${inter.className} text-muted-foreground dark:from-gray-800 dark:to-gray-800 dark:bg-gray-800 transition `}
         >
           <Providers>
             <ToastContainer />

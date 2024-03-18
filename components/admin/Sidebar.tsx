@@ -77,16 +77,18 @@ const Sidebar = () => {
 
   return (
     <div className="h-screen w-12 border-r-2 dark:text-gray-300 dark:border-gray-900 sm:w-[250px] sticky left-0 top-0 overflow-x-hidden bg-white dark:bg-gray-700">
-      <div className="h-12 flex dark:border-gray-900 items-center border-b-2 justify-center g1">
-        <Image
-          src="/favicon.png"
-          alt="Precedent logo"
-          width="20"
-          height="20"
-          className=" rounded-sm"
-        ></Image>
-        <Link href="/" className="logo hidden sm:flex text-green font-semibold">
-          Thuso.com
+      <div className="h-12 flex bg-sky-700 dark:border-gray-900 items-center border-b-2 justify-center ">
+        <Link href="/" className="flex items-center gap-1">
+          <Image
+            src="/favicon.png"
+            alt="Precedent logo"
+            width="20"
+            height="20"
+            className=" rounded-sm"
+          ></Image>
+          <span className="logo hidden sm:flex text-green font-semibold">
+            Thuso.com
+          </span>
         </Link>
       </div>
       <div className="px-2 my-3 text-xs sm:text-[16px] text-gray-400">Main</div>
@@ -96,7 +98,7 @@ const Sidebar = () => {
             href={link.link}
             className={
               link.link === pathname
-                ? "flex px-3 py-1 bg-sky-600 dark:bg-gray-900 hover:text-white items-center gap-2"
+                ? "flex px-3 py-1 bg-sky-600 dark:bg-gray-900 text-white items-center gap-2"
                 : "flex px-3 py-1 hover:bg-sky-600 hover:dark:bg-gray-900 hover:text-white items-center gap-2"
             }
             key={link.title}

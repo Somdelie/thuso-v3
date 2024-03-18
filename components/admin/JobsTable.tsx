@@ -1,12 +1,7 @@
 "use client";
 
 import * as React from "react";
-import {
-  CaretSortIcon,
-  ChevronDownIcon,
-  DotsHorizontalIcon,
-  Pencil1Icon,
-} from "@radix-ui/react-icons";
+import { ChevronDownIcon } from "@radix-ui/react-icons";
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -21,14 +16,10 @@ import {
 } from "@tanstack/react-table";
 
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
@@ -40,39 +31,48 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { DialogForm } from "../admin/Dailog";
 import { saveAs } from "file-saver";
-import { Calendar, Download, Phone } from "lucide-react";
-import { $Enums } from "@prisma/client";
+import { Download, Trash } from "lucide-react";
 import { formatCreatedAt } from "@/lib/formatDate";
+import Link from "next/link";
+import { MdDelete } from "react-icons/md";
 
-type Person = {
+// Define the Job model
+type Job = {
   id: string;
-  email: string;
-  name: string;
-  phone: string | null;
-  image: string | null;
-  status: $Enums.UserStatus;
-  userType: $Enums.UserType;
-  isAproved: string;
-  role: $Enums.UserRole;
-  documentPhoto: string | null;
+  title: string;
+  type: string;
+  locationType: string;
+  location?: string;
+  salary: string;
+  description?: string;
+  approved: boolean;
   createdAt: string;
+  updatedAt: string;
+  authorEmail?: string; // Reference to the user who owns the job
+  authorName?: string; // Author's name
 };
 
-const columns: ColumnDef<Person>[] = [
-  { accessorKey: "name", header: "Full Name" },
-  { accessorKey: "email", header: "Email" },
-  { accessorKey: "phone", header: "Phone" },
-  { accessorKey: "status", header: "Status" },
+const columns: ColumnDef<Job>[] = [
+  { accessorKey: "title", header: "Title" },
+  { accessorKey: "type", header: "Type" },
+  { accessorKey: "authorName", header: "Posted By" },
+  { accessorKey: "locationType", header: "Location Type" },
   {
-    accessorKey: "isAproved",
+    accessorKey: "location",
+    header: "Location",
+    cell: ({ row }) =>
+      row.original.location ? row.original.location : "Worldwide",
+  },
+  {
+    accessorKey: "approved",
     header: "Approved",
-    cell: ({ row }) => (
-      <div className="whitespace-nowrap">
-        {row.original.isAproved ? "Yes" : "No"}
-      </div>
-    ),
+    cell: ({ row }) =>
+      row.original.approved ? (
+        <span className="text-teal-600 font-semibold">Yes</span>
+      ) : (
+        <span className="text-red-500 font-semibold">No</span>
+      ),
   },
   {
     accessorKey: "createdAt",
@@ -83,12 +83,22 @@ const columns: ColumnDef<Person>[] = [
     id: "actions",
     header: "Action",
     cell: ({ row }) => (
-      <DialogForm user={row.original as any} userId={row.original.id} />
+      <div className="grid grid-cols-2 gap-3 h-6 w-full justify-between">
+        <Link
+          href="#"
+          className="border-2 h-full flex justify-center rounded items-center border-sky-700 hover:border-sky-600 px-2 "
+        >
+          View
+        </Link>{" "}
+        <button className="rounded h-full flex justify-center items-center px-2 bg-red-600 text-white hover:bg-red-700 font-semibold">
+          <MdDelete size={16} />
+        </button>
+      </div>
     ),
   },
 ];
 
-export function DataTable({ users }: { users: Person[] }) {
+export function DataTable({ jobs }: { jobs: Job[] }) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
@@ -96,8 +106,7 @@ export function DataTable({ users }: { users: Person[] }) {
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
-
-  const data: Person[] = users;
+  const data: Job[] = jobs;
 
   const table = useReactTable({
     data,
@@ -137,9 +146,9 @@ export function DataTable({ users }: { users: Person[] }) {
       <div className="flex items-center py-4">
         <Input
           placeholder="Search for any user..."
-          value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
+          value={(table.getColumn("title")?.getFilterValue() as string) ?? ""}
           onChange={(event) =>
-            table.getColumn("name")?.setFilterValue(event.target.value)
+            table.getColumn("title")?.setFilterValue(event.target.value)
           }
           className="max-w-sm "
         />

@@ -9,7 +9,7 @@ export const metadata = {
 const DashboardLayout = async ({ children }: { children: React.ReactNode }) => {
   return (
     <div className="flex w-full">
-      <Sidebar />{" "}
+      <Sidebar />
       <div className="w-full">
         <AdminNavbar />
         <main className="py-6 px-4 w-full">{children}</main>
